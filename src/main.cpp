@@ -916,6 +916,9 @@ String mqttHtmlProcess(const String& var) {
   else if (var == "CSTATEUNKNOWN") {
     return String(espConfig::mqttData.customLockStates["C_UNKNOWN"]);
   }
+  else if (var == "GPIOINMQQTTOPIC") {
+    return String(espConfig::mqttData.gpioInputTopic.c_str());
+  }
   return "";
 }
 
@@ -991,6 +994,9 @@ String actionsProcess(const String& var) {
   }
   else if (var == "FBLUEPIXELVAL") {
     return String(espConfig::miscConfig.neopixelFailureColor[espConfig::misc_config_t::colorMap::B]);
+  }
+  else if (var == "GPIOINPIN") {
+    return String(espConfig::miscConfig.gpioInputPin);
   }
   return "";
 }

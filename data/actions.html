@@ -123,6 +123,31 @@
           </div>
         </div>
       </div>
+      <div style="display:flex;flex-direction: column;border: 2px #8e8271 dashed;padding: 1rem;align-items: center;">
+        <h3 style="margin: 0 0 1rem;align-self: flex-start;">GPIO Trigger 2 MQTT Topic</h3>
+        <div style="display: flex;gap: 8px;flex-wrap: wrap;justify-content: center;">
+          <div style="display: flex;">
+            <fieldset>
+              <legend>ON GPIO High</legend>
+              <div style="display: flex;flex-direction: column;">
+                <label for="gpio-input-pin">GPIO Pin</label>
+                <input type="number" name="gpio-input-pin" id="gpio-input-pin" placeholder="255" required value="%GPIOINPIN%" min="0" max="255">
+              </div>
+              <div style="display: flex;flex-direction: column;margin-top: .7rem;">
+                <label for="gpio-input-mqtt-topic">MQTT State Topic</label>
+                <input type="number" name="gpio-input-mqtt-topic" id="gpio-input-mqtt-topic" placeholder="" required value="%GPIOINMQQTTOPIC%">
+              </div>
+              <div style="display: flex;margin-top: .7rem;gap: 8px;">
+                <label for="gpio-input-s-hl">GPIO State</label>
+                <select name="gpio-input-s-hl" id="gpio-input-s-hl">
+                  <option value="0">LOW</option>
+                  <option value="1">HIGH</option>
+                </select>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </div>
   </div>
   <div style="display: flex;flex-direction: column;border: 1px #8e8271 solid;border-radius: 8px;padding: 1rem;box-shadow: 0px 1px 1px 0px;background-color: #2d1d1d;">
     <h3 style="margin-top: 0;text-align: center;">HomeKit/HomeKey Triggers</h3>
