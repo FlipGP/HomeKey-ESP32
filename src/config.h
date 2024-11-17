@@ -43,6 +43,9 @@ enum customLockActions
 #define MQTT_SET_CURRENT_STATE_TOPIC "homekit/set_current_state" // MQTT Control Topic for the HomeKit lock current state
 #define MQTT_STATE_TOPIC "homekit/state" // MQTT Topic for publishing the HomeKit lock target state
 
+// FlipGP: Defined MQTT Topic for Door Bell
+#define MQTT_DOOR_BELL_STATE_TOPIC "homekit/door_bell_state"
+
 // Miscellaneous
 #define HOMEKEY_COLOR TAN
 #define SETUP_CODE "46637726"  // HomeKit Setup Code (only for reference, has to be changed during WiFi Configuration or from WebUI)
@@ -74,6 +77,9 @@ enum customLockActions
 #define GPIO_ACTION_UNLOCK_STATE HIGH
 #define GPIO_ACTION_MOMENTARY_STATE false
 #define GPIO_ACTION_MOMENTARY_TIMEOUT 5000
+
+// FlipGP: Defined GPIO Input PIN for Door Bell
+#define GPIO_DOORBELL_IN_PIN 255 // GPIO PIN for Door Bell -> 25
 
 // WebUI
 #define WEB_AUTH_ENABLED false

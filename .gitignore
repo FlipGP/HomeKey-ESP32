@@ -10,3 +10,4 @@ compile_commands.json
 src/config.h
 sdkconfig.*
 dependencies.lock
+platformio.exe

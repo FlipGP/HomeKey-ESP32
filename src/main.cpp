@@ -18,6 +18,7 @@
 #include <esp_task.h>
 #include <pins_arduino.h>
 #include <src/extras/Pixel.h>
+#include <Arduino.h>
 
 const char* TAG = "MAIN";
 
@@ -85,6 +86,12 @@ namespace espConfig
     /* MQTT Custom State */
     std::string lockCustomStateTopic;
     std::string lockCustomStateCmd;
+
+    /* FlipGP: Added MQTT Topic for Door Bell Info */ 
+    std::string gpioDoorBellStateTopic;
+
+
+
     /* Flags */
     bool lockEnableCustomState = MQTT_CUSTOM_STATE_ENABLED;
     bool hassMqttDiscoveryEnabled = MQTT_DISCOVERY;
@@ -120,6 +127,11 @@ namespace espConfig
     bool nfcSuccessHL = NFC_SUCCESS_HL;
     uint8_t nfcFailPin = NFC_FAIL_PIN;
     uint16_t nfcFailTime = NFC_FAIL_TIME;
+
+    /* FlipGP: Added GPIO Input PIN for Door Bell */ 
+    uint8_t gpioDoorBellInputPIN = GPIO_DOORBELL_IN_PIN;
+
+
     bool nfcFailHL = NFC_FAIL_HL;
     uint8_t gpioActionPin = GPIO_ACTION_PIN;
     bool gpioActionLockState = GPIO_ACTION_LOCK_STATE;
@@ -304,6 +316,79 @@ void nfc_gpio_task(void* arg) {
     vTaskDelay(100 / portTICK_PERIOD_MS);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// FlipGP to delete
+// GPIO-Pin definieren
+//#define GPIO_PIN 26
+
+void gpioMonitorTask(void *pvParameters) {
+    pinMode(GPIO_DOORBELL_IN_PIN, INPUT_PULLDOWN);  // Interner Pull-down-Widerstand aktivieren
+    int lastState = LOW;
+
+    while (true) {
+        int currentState = digitalRead(GPIO_DOORBELL_IN_PIN);
+
+        static unsigned long lastPrintTime = 0;
+        unsigned long now = millis();
+
+        if (now - lastPrintTime > 5000) {  // Nur alle 1000 ms ausgeben
+            Serial.println("Hallo, i bims, deine Looop...");
+            lastPrintTime = now;
+        }
+
+
+        // Zustandsänderung (mit Software-Debouncing)
+        if (currentState != lastState) {
+            vTaskDelay(10 / portTICK_PERIOD_MS);  // Warten für Entprellung
+            currentState = digitalRead(GPIO_DOORBELL_IN_PIN);
+            if (currentState != lastState) {
+                lastState = currentState;
+                if (currentState == HIGH) {
+                    Serial.println("GPIO HIGH erkannt! Nachricht senden...");
+                }
+            }
+        }
+
+        vTaskDelay(50 / portTICK_PERIOD_MS);  // CPU-Entlastung
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 struct LockMechanism : Service::LockMechanism
 {
@@ -917,7 +1002,7 @@ String mqttHtmlProcess(const String& var) {
     return String(espConfig::mqttData.customLockStates["C_UNKNOWN"]);
   }
   else if (var == "GPIOINMQQTTOPIC") {
-    return String(espConfig::mqttData.gpioInputTopic.c_str());
+    return String(espConfig::mqttData.gpioDoorBellStateTopic.c_str());
   }
   return "";
 }
@@ -996,7 +1081,7 @@ String actionsProcess(const String& var) {
     return String(espConfig::miscConfig.neopixelFailureColor[espConfig::misc_config_t::colorMap::B]);
   }
   else if (var == "GPIOINPIN") {
-    return String(espConfig::miscConfig.gpioInputPin);
+    return String(espConfig::miscConfig.gpioDoorBellInputPIN);
   }
   return "";
 }
@@ -1555,8 +1640,46 @@ void nfc_thread_entry(void* arg) {
   }
 }
 
+
+bool inRange(unsigned low, unsigned high, unsigned x)          
+{          
+ return (low <= x && x <= high);          
+} 
+
 void setup() {
   Serial.begin(115200);
+
+
+    // FlipGP: Added active Check and Task for Door Bell Monitor
+
+    if (inRange(16,39, GPIO_DOORBELL_IN_PIN)){
+      // GPIO-Monitor-Task erstellen
+      xTaskCreate(
+          gpioMonitorTask, // Task-Funktion
+          "GPIO Door Bell Monitor",  // Name der Task
+          4096,            // Stack-Größe (4 KB)
+          NULL,            // Keine Parameter
+          2,               // Priorität
+          NULL             // Kein Handle benötigt
+      );
+    }
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   const esp_app_desc_t* app_desc = esp_ota_get_app_description();
   std::string app_version = app_desc->version;
   gpio_led_handle = xQueueCreate(2, sizeof(uint8_t));
